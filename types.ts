@@ -11,7 +11,10 @@ export enum Page {
   CONTACT = 'CONTACT',
   BLOG = 'BLOG',
   CAREERS = 'CAREERS',
-  LOGIN = 'LOGIN'
+  LOGIN = 'LOGIN',
+  PRIVACY = 'PRIVACY',
+  TERMS = 'TERMS',
+  SLA = 'SLA'
 }
 
 export interface ServiceItem {

@@ -1,30 +1,39 @@
-import React, { useState } from 'react';
-import { Page } from '../types';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { Button } from './UI';
 import { Truck, Menu, X, Phone, Mail, MapPin, Linkedin, Twitter, Facebook, ChevronDown } from 'lucide-react';
 
 interface LayoutProps {
   children: React.ReactNode;
-  currentPage: Page;
-  onNavigate: (page: Page) => void;
 }
 
-export const Layout: React.FC<LayoutProps> = ({ children, currentPage, onNavigate }) => {
+export const Layout: React.FC<LayoutProps> = ({ children }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  // Scroll to top on route change
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [location.pathname]);
 
   const navItems = [
-    { label: 'Home', page: Page.HOME },
-    { label: 'Services', page: Page.SERVICES },
-    { label: 'Industries', page: Page.INDUSTRIES },
-    { label: 'Tech Stack', page: Page.TECHNOLOGIES },
-    { label: 'Products', page: Page.PRODUCTS },
-    { label: 'Company', page: Page.ABOUT },
+    { label: 'Home', path: '/' },
+    { label: 'Services', path: '/services' },
+    { label: 'Industries', path: '/industries' },
+    { label: 'Tech Stack', path: '/technologies' },
+    { label: 'Products', path: '/products' },
+    { label: 'Company', path: '/about' },
   ];
 
-  const handleNav = (page: Page) => {
-    onNavigate(page);
+  const handleNav = (path: string) => {
+    navigate(path);
     setMobileMenuOpen(false);
-    window.scrollTo(0, 0);
+  };
+
+  const isActive = (path: string) => {
+    if (path === '/' && location.pathname !== '/') return false;
+    return location.pathname.startsWith(path);
   };
 
   return (
@@ -37,9 +46,9 @@ export const Layout: React.FC<LayoutProps> = ({ children, currentPage, onNavigat
             <span className="flex items-center hover:text-brand-orange cursor-pointer"><Mail className="w-3 h-3 mr-2" /> solutions@logitech.com</span>
           </div>
           <div className="flex space-x-4">
-             <span className="hover:text-white cursor-pointer" onClick={() => handleNav(Page.CAREERS)}>Careers</span>
-             <span className="hover:text-white cursor-pointer" onClick={() => handleNav(Page.BLOG)}>Blog</span>
-             <span className="hover:text-white cursor-pointer" onClick={() => handleNav(Page.LOGIN)}>Client Portal</span>
+             <span className="hover:text-white cursor-pointer" onClick={() => handleNav('/careers')}>Careers</span>
+             <span className="hover:text-white cursor-pointer" onClick={() => handleNav('/blog')}>Blog</span>
+             <span className="hover:text-white cursor-pointer" onClick={() => handleNav('/login')}>Client Portal</span>
           </div>
         </div>
       </div>
@@ -48,7 +57,7 @@ export const Layout: React.FC<LayoutProps> = ({ children, currentPage, onNavigat
       <header className="sticky top-0 z-50 bg-white shadow-md border-b border-gray-100">
         <div className="container mx-auto px-6 h-20 flex justify-between items-center">
           {/* Logo */}
-          <div className="flex items-center cursor-pointer group" onClick={() => handleNav(Page.HOME)}>
+          <div className="flex items-center cursor-pointer group" onClick={() => handleNav('/')}>
             <div className="bg-brand-orange p-2 rounded mr-3 group-hover:bg-orange-700 transition-colors">
               <Truck className="w-6 h-6 text-white" />
             </div>
@@ -63,9 +72,9 @@ export const Layout: React.FC<LayoutProps> = ({ children, currentPage, onNavigat
             {navItems.map((item) => (
               <button
                 key={item.label}
-                onClick={() => handleNav(item.page)}
+                onClick={() => handleNav(item.path)}
                 className={`text-sm font-bold uppercase tracking-wide transition-colors duration-200 ${
-                  currentPage === item.page ? 'text-brand-orange' : 'text-gray-700 hover:text-brand-orange'
+                  isActive(item.path) ? 'text-brand-orange' : 'text-gray-700 hover:text-brand-orange'
                 }`}
               >
                 {item.label}
@@ -75,7 +84,7 @@ export const Layout: React.FC<LayoutProps> = ({ children, currentPage, onNavigat
 
           {/* CTA & Mobile Toggle */}
           <div className="flex items-center space-x-4">
-            <Button size="sm" onClick={() => handleNav(Page.CONTACT)} className="hidden md:inline-flex">
+            <Button size="sm" onClick={() => handleNav('/contact')} className="hidden md:inline-flex">
               Get A Quote
             </Button>
             <button 
@@ -94,15 +103,17 @@ export const Layout: React.FC<LayoutProps> = ({ children, currentPage, onNavigat
               {navItems.map((item) => (
                 <button
                   key={item.label}
-                  onClick={() => handleNav(item.page)}
-                  className="text-left font-bold text-gray-800 hover:text-brand-orange py-3 border-b border-gray-50 text-lg"
+                  onClick={() => handleNav(item.path)}
+                  className={`text-left font-bold py-3 border-b border-gray-50 text-lg ${
+                    isActive(item.path) ? 'text-brand-orange' : 'text-gray-800 hover:text-brand-orange'
+                  }`}
                 >
                   {item.label}
                 </button>
               ))}
               <div className="pt-4 flex flex-col space-y-3">
-                 <Button onClick={() => handleNav(Page.CONTACT)} className="w-full">Get A Quote</Button>
-                 <Button variant="outline" onClick={() => handleNav(Page.LOGIN)} className="w-full">Client Login</Button>
+                 <Button onClick={() => handleNav('/contact')} className="w-full">Get A Quote</Button>
+                 <Button variant="outline" onClick={() => handleNav('/login')} className="w-full">Client Login</Button>
               </div>
             </div>
           </div>
@@ -139,11 +150,11 @@ export const Layout: React.FC<LayoutProps> = ({ children, currentPage, onNavigat
             <div>
               <h3 className="text-lg font-bold mb-6 uppercase tracking-wider text-brand-orange">Services</h3>
               <ul className="space-y-3 text-gray-400 text-sm">
-                <li className="hover:text-white cursor-pointer" onClick={() => handleNav(Page.SERVICES)}>Transportation TMS</li>
-                <li className="hover:text-white cursor-pointer" onClick={() => handleNav(Page.SERVICES)}>Fleet Management</li>
-                <li className="hover:text-white cursor-pointer" onClick={() => handleNav(Page.SERVICES)}>Driver Mobile Apps</li>
-                <li className="hover:text-white cursor-pointer" onClick={() => handleNav(Page.SERVICES)}>Freight Brokerage Web</li>
-                <li className="hover:text-white cursor-pointer" onClick={() => handleNav(Page.SERVICES)}>Logistics ERP</li>
+                <li className="hover:text-white cursor-pointer" onClick={() => handleNav('/services')}>Transportation TMS</li>
+                <li className="hover:text-white cursor-pointer" onClick={() => handleNav('/services')}>Fleet Management</li>
+                <li className="hover:text-white cursor-pointer" onClick={() => handleNav('/services')}>Driver Mobile Apps</li>
+                <li className="hover:text-white cursor-pointer" onClick={() => handleNav('/services')}>Freight Brokerage Web</li>
+                <li className="hover:text-white cursor-pointer" onClick={() => handleNav('/services')}>Logistics ERP</li>
               </ul>
             </div>
 
@@ -151,11 +162,11 @@ export const Layout: React.FC<LayoutProps> = ({ children, currentPage, onNavigat
             <div>
               <h3 className="text-lg font-bold mb-6 uppercase tracking-wider text-brand-orange">Quick Links</h3>
               <ul className="space-y-3 text-gray-400 text-sm">
-                <li className="hover:text-white cursor-pointer" onClick={() => handleNav(Page.ABOUT)}>About Us</li>
-                <li className="hover:text-white cursor-pointer" onClick={() => handleNav(Page.CAREERS)}>Careers <span className="text-xs bg-brand-orange text-white px-1 ml-1 rounded">Hiring</span></li>
-                <li className="hover:text-white cursor-pointer" onClick={() => handleNav(Page.BLOG)}>Industry Insights</li>
-                <li className="hover:text-white cursor-pointer" onClick={() => handleNav(Page.CONTACT)}>Contact Support</li>
-                <li className="hover:text-white cursor-pointer" onClick={() => handleNav(Page.LOGIN)}>Client Portal</li>
+                <li className="hover:text-white cursor-pointer" onClick={() => handleNav('/about')}>About Us</li>
+                <li className="hover:text-white cursor-pointer" onClick={() => handleNav('/careers')}>Careers <span className="text-xs bg-brand-orange text-white px-1 ml-1 rounded">Hiring</span></li>
+                <li className="hover:text-white cursor-pointer" onClick={() => handleNav('/blog')}>Industry Insights</li>
+                <li className="hover:text-white cursor-pointer" onClick={() => handleNav('/contact')}>Contact Support</li>
+                <li className="hover:text-white cursor-pointer" onClick={() => handleNav('/login')}>Client Portal</li>
               </ul>
             </div>
 
@@ -182,9 +193,9 @@ export const Layout: React.FC<LayoutProps> = ({ children, currentPage, onNavigat
           <div className="border-t border-gray-800 pt-8 flex flex-col md:flex-row justify-between items-center text-xs text-gray-500">
             <p>&copy; 2024 LogiTech Solutions. All rights reserved.</p>
             <div className="flex space-x-6 mt-4 md:mt-0">
-              <span className="cursor-pointer hover:text-white">Privacy Policy</span>
-              <span className="cursor-pointer hover:text-white">Terms of Service</span>
-              <span className="cursor-pointer hover:text-white">SLA</span>
+              <span className="cursor-pointer hover:text-white" onClick={() => handleNav('/privacy')}>Privacy Policy</span>
+              <span className="cursor-pointer hover:text-white" onClick={() => handleNav('/terms')}>Terms of Service</span>
+              <span className="cursor-pointer hover:text-white" onClick={() => handleNav('/sla')}>SLA</span>
             </div>
           </div>
         </div>
